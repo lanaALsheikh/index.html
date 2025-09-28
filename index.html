@@ -1,211 +1,253 @@
 <!doctype html>
 <html lang="ar">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>محاكي صوت الكأس</title>
-<style>
-  :root{--bg:#0f1724;--card:#0b1220;--accent:#7dd3fc}
-  html,body{height:100%;margin:0;font-family:Almarai, system-ui, sans-serif;background:linear-gradient(180deg,#071026 0%, #0b1220 100%);color:#e6eef6}
-  .wrap{max-width:980px;margin:28px auto;padding:18px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));box-shadow:0 8px 30px rgba(2,6,23,0.7)}
-  h1{margin:0 0 6px;font-size:20px}
-  p{margin:6px 0 18px;color:#a8b6c8}
-  .stage{display:grid;grid-template-columns:1fr 320px;gap:18px}
-  canvas{width:100%;height:520px;background:linear-gradient(180deg,#06202b, #071428);border-radius:10px;display:block}
-  .controls{padding:12px;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);border-radius:10px}
-  label{display:block;font-size:13px;margin-top:10px;color:#cfe8ff}
-  input[type=range]{width:100%}
-  .row{display:flex;gap:8px;align-items:center}
-  button{margin-top:12px;padding:8px 10px;border-radius:8px;border:0;background:var(--accent);color:#012029;font-weight:600}
-  .small{font-size:13px;color:#99b5cc}
-  .credits{margin-top:12px;font-size:12px;color:#7f99b0}
-  .author{margin-top:20px;font-size:16px;color:#7dd3fc;text-align:center;font-weight:600;}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>محاكي صوت الكأس</title>
+  <style>
+    :root {
+      --bg: #0f1724;
+      --card: #0b1220;
+      --accent: #7dd3fc;
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: 'Almarai', sans-serif;
+      background: linear-gradient(180deg, #071026 0%, #0b1220 100%);
+      color: #e6eef6;
+      display: flex;
+      flex-direction: column;
+    }
+    .wrap {
+      flex: 1;
+      padding: 16px;
+      max-width: 960px;
+      margin: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    h1 {
+      font-size: 20px;
+      margin: 0;
+    }
+    p {
+      margin: 0;
+      color: #a8b6c8;
+      font-size: 14px;
+    }
+    canvas {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      background: linear-gradient(180deg,#06202b, #071428);
+      border-radius: 10px;
+      display: block;
+      touch-action: none;
+    }
+    .controls {
+      padding: 12px;
+      border-radius: 10px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+    }
+    label {
+      display: block;
+      font-size: 13px;
+      margin-top: 10px;
+      color: #cfe8ff;
+    }
+    input[type=range] {
+      width: 100%;
+    }
+    button {
+      margin-top: 12px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 0;
+      background: var(--accent);
+      color: #012029;
+      font-weight: 600;
+      width: 100%;
+    }
+    .credits {
+      margin-top: 10px;
+      font-size: 12px;
+      color: #7f99b0;
+    }
+    .author {
+      margin-top: 16px;
+      font-size: 15px;
+      color: #7dd3fc;
+      text-align: center;
+    }
+  </style>
 </head>
 <body>
-<div class="wrap">
-  <h1>محاكي صوت الكأس — Glass Cup Simulator</h1>
-  <p>حرّك الماوس أو إصبعك بشكل دائري حول الكأس الافتراضي لمشاهدة تأثير موجات الصوت. زيادة السرعة = صوت أعلى وطبقة أعلى.</p>
-  <div class="stage">
-    <canvas id="c" width="800" height="520"></canvas>
+  <div class="wrap">
+    <h1>محاكي صوت الكأس</h1>
+    <p>حرّك بإصبعك أو الماوس حول الدائرة لتوليد الصوت.</p>
+
+    <canvas id="c"></canvas>
+
     <div class="controls">
-      <div class="row"><strong>الحجم (نغمة القاعدة)</strong></div>
+      <label>الحجم (نغمة القاعدة)</label>
       <input id="size" type="range" min="0.5" max="2.0" step="0.01" value="1.0" />
-      <label class="small">حساسية الحركة</label>
+
+      <label>حساسية الحركة</label>
       <input id="sensitivity" type="range" min="0.2" max="5.0" step="0.1" value="1.6" />
-      <label class="small">رنين (Q)</label>
+
+      <label>رنين (Q)</label>
       <input id="q" type="range" min="2" max="40" step="1" value="18" />
-      <label class="small">مستوى الصدى (Reverb)</label>
+
+      <label>مستوى الصدى</label>
       <input id="reverb" type="range" min="0" max="1" step="0.01" value="0.28" />
-      <div class="row"><button id="start">تشغيل / إيقاف الصوت</button></div>
-      <div class="credits">مدعوم بـ Web Audio API — اسحب حول الكأس على الكانفاس (دعم اللمس والماوس).</div>
+
+      <button id="start">تشغيل / إيقاف الصوت</button>
+      <div class="credits">تم باستخدام Web Audio API</div>
     </div>
+
+    <div class="author">لانا محمد الشيخ</div>
   </div>
-  <div class="author">لانا محمد الشيخ</div>
-</div>
-<script>
-const canvas = document.getElementById('c');
-const ctx = canvas.getContext('2d');
-const startBtn = document.getElementById('start');
-const sizeR = document.getElementById('size');
-const sensR = document.getElementById('sensitivity');
-const qR = document.getElementById('q');
-const revR = document.getElementById('reverb');
-let audioCtx = null;
-let running=false;
-let center={x:canvas.width/2,y:canvas.height/2};
-let radius=160;
-let pointer=null;
-let lastAngle=null;let lastTime=null;let angularSpeed=0;
-let masterGain, noiseBuf, noiseSrc, resonators = [], convolver;
 
-function setupAudio(){
-  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  masterGain = audioCtx.createGain(); 
-  masterGain.gain.value = 0.03; 
-  masterGain.connect(audioCtx.destination);
-  const bufferSize = 2 * audioCtx.sampleRate;
-  noiseBuf = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-  const data = noiseBuf.getChannelData(0);
-  for(let i=0;i<bufferSize;i++) data[i] = (Math.random()*2-1)*0.6;
-  convolver = audioCtx.createConvolver();
-  const ir = audioCtx.createBuffer(2, audioCtx.sampleRate*2, audioCtx.sampleRate);
-  for(let ch=0; ch<2; ch++){
-    const id = ir.getChannelData(ch);
-    for(let i=0;i<ir.length;i++) id[i] = (Math.random()*2-1) * Math.pow(1 - i/ir.length, 2);
-  }
-  convolver.buffer = ir;
-  convolver.normalize = true;
-  convolver.connect(masterGain);
-  const base = 420;
-  for(let i=0;i<6;i++){
-    const f = base * [1,1.35,1.9,2.6,3.5,4.4][i];
-    const osc = audioCtx.createOscillator();
-    osc.type = 'sine';
-    osc.frequency.value = f;
-    const g = audioCtx.createGain(); g.gain.value = 0;
-    osc.connect(g);
-    g.connect(masterGain);
-    osc.start();
-    resonators.push({osc,g,f});
-  }
-}
+  <script>
+    const canvas = document.getElementById('c');
+    const ctx = canvas.getContext('2d');
+    const startBtn = document.getElementById('start');
+    const sizeR = document.getElementById('size');
+    const sensR = document.getElementById('sensitivity');
+    const qR = document.getElementById('q');
+    const revR = document.getElementById('reverb');
 
-function startNoise(){
-  if(!audioCtx) setupAudio();
-  noiseSrc = audioCtx.createBufferSource();
-  noiseSrc.buffer = noiseBuf;
-  noiseSrc.loop = true;
-  const bp = audioCtx.createBiquadFilter();
-  bp.type = 'bandpass'; bp.frequency.value = 1200; bp.Q.value = qR.value;
-  const g = audioCtx.createGain(); g.gain.value = 0;
-  noiseSrc.connect(bp);
-  bp.connect(g);
-  g.connect(convolver);
-  noiseSrc.start();
-  convolver.connect(masterGain);
-}
+    let audioCtx = null;
+    let masterGain, noiseBuf, noiseSrc, resonators = [], convolver;
+    let center = { x: 0, y: 0 }, radius = 0;
+    let pointerDown = false, pointer = null;
+    let lastAngle = null, lastTime = null, angularSpeed = 0;
+    let running = false;
 
-function stopNoise(){
-  if(noiseSrc){ try{ noiseSrc.stop(); } catch(e){} noiseSrc.disconnect(); noiseSrc=null; }
-}
+    function setupAudio() {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      masterGain = audioCtx.createGain();
+      masterGain.gain.value = 0.03;
+      masterGain.connect(audioCtx.destination);
 
-function draw(){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  const grd = ctx.createLinearGradient(0,0,0,canvas.height);
-  grd.addColorStop(0,'rgba(255,255,255,0.02)');
-  grd.addColorStop(1,'rgba(255,255,255,0.01)');
-  ctx.fillStyle = grd; ctx.fillRect(0,0,canvas.width,canvas.height);
-  ctx.save();
-  ctx.translate(center.x, center.y);
-  ctx.beginPath();
-  ctx.strokeStyle = '#7dd3fc';
-  ctx.lineWidth = 6;
-  ctx.arc(0, 0, radius, 0, Math.PI * 2);
-  ctx.stroke();
-  ctx.restore();
-  if(lastAngle!=null){
-    ctx.save();
-    ctx.translate(center.x, center.y);
-    const ang = lastAngle;
-    const px = Math.cos(ang)*radius, py = Math.sin(ang)*radius;
-    ctx.beginPath();
-    ctx.fillStyle = '#fff'; ctx.globalAlpha = 0.92;
-    ctx.arc(px,py,8,0,Math.PI*2);
-    ctx.fill();
-    ctx.restore();
-  }
-  ctx.fillStyle='#cde9ff'; ctx.font='14px sans-serif'; 
-  ctx.fillText('اسحب بشكل دائري هنا (ماوس/لمس)',20,30);
-  requestAnimationFrame(draw);
-}
+      const bufferSize = 2 * audioCtx.sampleRate;
+      noiseBuf = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+      const data = noiseBuf.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) data[i] = (Math.random() * 2 - 1) * 0.6;
 
-function pointerToAngle(x,y){ return Math.atan2(y-center.y, x-center.x); }
+      convolver = audioCtx.createConvolver();
+      const ir = audioCtx.createBuffer(2, audioCtx.sampleRate * 2, audioCtx.sampleRate);
+      for (let ch = 0; ch < 2; ch++) {
+        const id = ir.getChannelData(ch);
+        for (let i = 0; i < ir.length; i++) id[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / ir.length, 2);
+      }
+      convolver.buffer = ir;
+      convolver.normalize = true;
+      convolver.connect(masterGain);
 
-function onPointer(e){
-  const rect = canvas.getBoundingClientRect();
-  let x = (e.clientX ?? e.touches[0].clientX) - rect.left;
-  let y = (e.clientY ?? e.touches[0].clientY) - rect.top;
-  pointer = {x,y};
-  const ang = pointerToAngle(x,y);
-  const now = performance.now();
-  if(lastAngle!=null && lastTime!=null){
-    let delta = ang - lastAngle;
-    while(delta > Math.PI) delta -= Math.PI*2;
-    while(delta < -Math.PI) delta += Math.PI*2;
-    const dt = (now - lastTime)/1000;
-    const angSpeed = delta/dt;
-    angularSpeed = angularSpeed*0.6 + angSpeed*0.4;
-    driveAudioFromSpeed(Math.abs(angularSpeed));
-  }
-  lastAngle = ang; lastTime = now;
-}
+      const base = 420;
+      for (let i = 0; i < 6; i++) {
+        const f = base * [1, 1.35, 1.9, 2.6, 3.5, 4.4][i];
+        const osc = audioCtx.createOscillator();
+        osc.type = 'sine';
+        osc.frequency.value = f;
+        const g = audioCtx.createGain();
+        g.gain.value = 0;
+        osc.connect(g);
+        g.connect(masterGain);
+        osc.start();
+        resonators.push({ osc, g, f });
+      }
+    }
 
-function driveAudioFromSpeed(speed){
-  const sens = parseFloat(sensR.value);
-  const level = Math.tanh(speed * sens) * 0.9;
-  const baseScale = parseFloat(sizeR.value);
-  const baseFreq = 380 * (1/baseScale);
-  for(let i=0;i<resonators.length;i++){
-    const r = resonators[i];
-    const harm = [1,1.35,1.9,2.6,3.5,4.4][i];
-    r.osc.frequency.setTargetAtTime(baseFreq * harm, audioCtx.currentTime, 0.03);
-    const weight = [0.9,0.45,0.28,0.12,0.06,0.03][i];
-    r.g.gain.setTargetAtTime(level * weight * 0.6, audioCtx.currentTime, 0.02);
-  }
-  masterGain.gain.setTargetAtTime(0.001 + level*0.06, audioCtx.currentTime, 0.02);
-}
+    function startNoise() {
+      if (!audioCtx) setupAudio();
+      noiseSrc = audioCtx.createBufferSource();
+      noiseSrc.buffer = noiseBuf;
+      noiseSrc.loop = true;
+      const bp = audioCtx.createBiquadFilter();
+      bp.type = 'bandpass'; bp.frequency.value = 1200; bp.Q.value = qR.value;
+      const g = audioCtx.createGain(); g.gain.value = 0;
+      noiseSrc.connect(bp); bp.connect(g); g.connect(convolver);
+      noiseSrc.start();
+      convolver.connect(masterGain);
+    }
 
-let pointerDown=false;
-canvas.addEventListener('pointerdown', (e)=>{ canvas.setPointerCapture(e.pointerId); pointerDown=true; onPointer(e); });
-canvas.addEventListener('pointermove', (e)=>{ if(pointerDown) onPointer(e); });
-window.addEventListener('pointerup', (e)=>{ pointerDown=false; lastAngle=null; lastTime=null; angularSpeed=0; driveAudioFromSpeed(0); });
-canvas.addEventListener('touchstart',(e)=>{ e.preventDefault(); onPointer(e); });
-canvas.addEventListener('touchmove',(e)=>{ e.preventDefault(); onPointer(e); });
-canvas.addEventListener('touchend',(e)=>{ pointerDown=false; lastAngle=null; angularSpeed=0; driveAudioFromSpeed(0); });
+    function stopNoise() {
+      if (noiseSrc) { try { noiseSrc.stop(); } catch (e) { } noiseSrc.disconnect(); noiseSrc = null; }
+    }
 
-startBtn.addEventListener('click', async ()=>{
-  if(!audioCtx){ setupAudio(); }
-  if(!running){
-    await audioCtx.resume();
-    startNoise();
-    running=true; startBtn.textContent='إيقاف الصوت';
-  } else {
-    stopNoise();
-    running=false; startBtn.textContent='تشغيل / إيقاف الصوت';
-    resonators.forEach(r=> r.g.gain.setTargetAtTime(0, audioCtx.currentTime, 0.02));
-    masterGain.gain.setTargetAtTime(0.0002, audioCtx.currentTime, 0.02);
-  }
-});
+    function pointerToAngle(x, y) {
+      return Math.atan2(y - center.y, x - center.x);
+    }
 
-function resize(){
-  const rect = canvas.getBoundingClientRect();
-  canvas.width = rect.width * devicePixelRatio; canvas.height = rect.height * devicePixelRatio;
-  center = {x:canvas.width/2, y:canvas.height/2};
-  radius = Math.min(canvas.width, canvas.height) * 0.18 * devicePixelRatio;
-}
-window.addEventListener('resize', resize); resize(); draw();
-</script>
+    function onPointer(e) {
+      const rect = canvas.getBoundingClientRect();
+      const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+      const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+      const ang = pointerToAngle(x, y);
+      const now = performance.now();
+      if (lastAngle != null && lastTime != null) {
+        let delta = ang - lastAngle;
+        while (delta > Math.PI) delta -= Math.PI * 2;
+        while (delta < -Math.PI) delta += Math.PI * 2;
+        const dt = (now - lastTime) / 1000;
+        const angSpeed = delta / dt;
+        angularSpeed = angularSpeed * 0.6 + angSpeed * 0.4;
+        driveAudioFromSpeed(Math.abs(angularSpeed));
+      }
+      lastAngle = ang; lastTime = now;
+    }
+
+    function driveAudioFromSpeed(speed) {
+      const sens = parseFloat(sensR.value);
+      const amp = Math.min(speed * sens, 1);
+      if (resonators.length) {
+        resonators.forEach((r, i) => {
+          const spread = 0.7 + (i * 0.15);
+          r.g.gain.value = amp * (1 / spread);
+          r.osc.frequency.value = r.f * parseFloat(sizeR.value);
+        });
+      }
+      if (convolver) convolver.gain.value = amp * parseFloat(revR.value);
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.beginPath();
+      ctx.arc(center.x, center.y, radius, 0, Math.PI * 2);
+      ctx.strokeStyle = "#7dd3fc";
+      ctx.lineWidth = 4;
+      ctx.stroke();
+      requestAnimationFrame(draw);
+    }
+
+    function resize() {
+      canvas.width = canvas.clientWidth;
+      canvas.height = canvas.clientHeight;
+      center.x = canvas.width / 2;
+      center.y = canvas.height / 2;
+      radius = canvas.width / 2.5;
+    }
+
+    window.addEventListener('resize', resize);
+    resize();
+    draw();
+
+    canvas.addEventListener('pointerdown', e => { pointerDown = true; onPointer(e); });
+    canvas.addEventListener('pointermove', e => { if (pointerDown) onPointer(e); });
+    canvas.addEventListener('pointerup', e => { pointerDown = false; angularSpeed = 0; });
+    canvas.addEventListener('touchmove', onPointer);
+    canvas.addEventListener('touchstart', onPointer);
+    canvas.addEventListener('touchend', () => { angularSpeed = 0; });
+
+    startBtn.addEventListener('click', () => {
+      running = !running;
+      if (running) startNoise(); else stopNoise();
+    });
+  </script>
 </body>
 </html>
 
